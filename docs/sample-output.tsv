@@ -1,0 +1,11 @@
+# 3 binaries, 7 findings
+high	ELF002	legacy	not position independent: build with -fPIE -pie so ASLR randomises the binary
+high	ELF001	sloppy	stack is executable (NX off): link with -z noexecstack
+medium	ELF005	legacy	no RELRO: link with -z relro -z now
+medium	ELF006	legacy	no __stack_chk_fail import: no stack protector, or no function needed one; check -fstack-protector-strong
+medium	ELF007	legacy	imports unsafe functions: strcpy
+medium	ELF006	sloppy	no __stack_chk_fail import: no stack protector, or no function needed one; check -fstack-protector-strong
+low	ELF010	sloppy	DT_RUNPATH is set: check it does not point at a writable directory
+info	ELF011	hardened	PIE, NX on, RELRO full, canary yes, fortify 1, stripped
+info	ELF011	legacy	no PIE, NX on, RELRO none, canary no, fortify 0, not stripped
+info	ELF011	sloppy	PIE, NX off, RELRO full, canary no, fortify 1, not stripped
