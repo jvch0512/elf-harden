@@ -24,7 +24,8 @@ static unsigned char *slurp(const char *path, size_t *n) {
 static const char *PROG =
     "#include <stdio.h>\n#include <string.h>\n"
     "int main(int argc, char **argv) { char b[64]; if (argc > 1) { strcpy(b, argv[1]); sprintf(b, \"%s\", argv[0]); puts(b); } return 0; }\n";
-static const char *GETS_PROG = "#include <stdio.h>\nint main(void) { char b[16]; gets(b); return b[0]; }\n";
+/* gets() is gone from recent glibc headers and from new links, so declare it and leave the import unresolved: the checker only reads the import table. */
+static const char *GETS_PROG = "extern char *gets(char *);\nint main(void) { char b[16]; gets(b); return b[0]; }\n";
 
 static int build(const char *src, const char *flags, const char *out) {
     char cmd[1024];
@@ -85,7 +86,7 @@ int main(void) {
     CHECK(analyse(out, &r) == 0); CHECK(r.runpath && !r.rpath);
 
     /* gets */
-    CHECK(build(GETS_PROG, "-fPIE -pie", out) == 0);
+    CHECK(build(GETS_PROG, "-fPIE -pie -Wl,--unresolved-symbols=ignore-all", out) == 0);
     CHECK(analyse(out, &r) == 0); CHECK(r.gets);
 
     /* shared library: not an executable, never "not PIE" */
