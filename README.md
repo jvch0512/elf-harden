@@ -2,6 +2,8 @@
 
 elf-harden reads ELF executables and shared libraries and reports which exploit mitigations are missing: position independent code (ASLR), non-executable stack, RELRO, stack protector, FORTIFY_SOURCE, RPATH and RUNPATH, text relocations and imports of dangerous functions such as `gets`. It parses the file itself and never runs it, so it is safe on suspicious binaries.
 
+![Terminal demo of elf-harden on its sample data](docs/demo.svg)
+
 **Live demo:** https://jvch0512.github.io/elf-harden/ (Small binaries built from a toy program with different compiler flags.)
 
 C11, no libraries (reads ELF64 little-endian files). The demo page is rendered from the tool's `--tsv` output by `scripts/site.py` (Python 3, only needed to regenerate the page).
@@ -51,3 +53,13 @@ make test    # 64 checks
 ```
 
 MIT.
+
+## Code scanning (SARIF)
+
+`scripts/tsv2sarif.py` converts the `--tsv` output into SARIF 2.1.0, so findings show up in GitHub code scanning:
+
+```sh
+./elf-harden examples/bin --tsv | python3 scripts/tsv2sarif.py --tool elf-harden --prefix examples/bin > results.sarif
+```
+
+Upload `results.sarif` with `github/codeql-action/upload-sarif`. Severities map to SARIF levels (critical and high to error, medium to warning, low and info to note) and to a `security-severity` score.
